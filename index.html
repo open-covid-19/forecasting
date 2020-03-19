@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><!-- HTML page head --><head>
+    <!-- HTML metadata -->
+    <meta charset="UTF-8">
+    <title>Open COVID-19 Forecasting</title>
+    <meta name="description" content="Forecasting of COVID-19 positive cases using open COVID-19 dataset">
+    <link rel="icon" type="image/png" href="static/logo-64.png">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Open COVID-19 Forecasting">
+
+    <!-- Homescreen icons -->
+    <link rel="apple-touch-icon" href="static/icon-64x64.png">
+    <link rel="apple-touch-icon" sizes="64x64" href="static/icon-64x64.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="static/icon-128x128.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="static/icon-512x512.png">
+
+    <!-- Capabilities-related metadata -->
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="https://unpkg.com/picnic">
+    <link rel="stylesheet" href="static/styles.min.css">
+
+
+    </head><body>
+
+        <!-- Main section -->
+        <div class="flex">
+
+            <!-- Render all of the countries as options -->
+            <select id="country"><option value="charts/2020-03-18_AE.svg">AE</option><option value="charts/2020-03-18_AT.svg">AT</option><option value="charts/2020-03-18_AU.svg">AU</option><option value="charts/2020-03-18_BE.svg">BE</option><option value="charts/2020-03-18_BH.svg">BH</option><option value="charts/2020-03-18_BR.svg">BR</option><option value="charts/2020-03-18_CA.svg">CA</option><option value="charts/2020-03-18_CH.svg">CH</option><option value="charts/2020-03-18_CN.svg">CN</option><option value="charts/2020-03-18_CZ.svg">CZ</option><option value="charts/2020-03-18_DE.svg">DE</option><option value="charts/2020-03-18_DK.svg">DK</option><option value="charts/2020-03-18_DZ.svg">DZ</option><option value="charts/2020-03-18_EG.svg">EG</option><option value="charts/2020-03-18_ES.svg">ES</option><option value="charts/2020-03-18_FI.svg">FI</option><option value="charts/2020-03-18_FR.svg">FR</option><option value="charts/2020-03-18_GB.svg">GB</option><option value="charts/2020-03-18_GE.svg">GE</option><option value="charts/2020-03-18_GR.svg">GR</option><option value="charts/2020-03-18_HR.svg">HR</option><option value="charts/2020-03-18_IE.svg">IE</option><option value="charts/2020-03-18_IL.svg">IL</option><option value="charts/2020-03-18_IN.svg">IN</option><option value="charts/2020-03-18_IQ.svg">IQ</option><option value="charts/2020-03-18_IR.svg">IR</option><option value="charts/2020-03-18_IS.svg">IS</option><option value="charts/2020-03-18_IT.svg">IT</option><option value="charts/2020-03-18_JP.svg">JP</option><option value="charts/2020-03-18_KR.svg">KR</option><option value="charts/2020-03-18_KW.svg">KW</option><option value="charts/2020-03-18_LB.svg">LB</option><option value="charts/2020-03-18_MY.svg">MY</option><option value="charts/2020-03-18_NL.svg">NL</option><option value="charts/2020-03-18_NO.svg">NO</option><option value="charts/2020-03-18_PL.svg">PL</option><option value="charts/2020-03-18_PS.svg">PS</option><option value="charts/2020-03-18_PT.svg">PT</option><option value="charts/2020-03-18_QA.svg">QA</option><option value="charts/2020-03-18_RO.svg">RO</option><option value="charts/2020-03-18_SA.svg">SA</option><option value="charts/2020-03-18_SE.svg">SE</option><option value="charts/2020-03-18_SG.svg">SG</option><option value="charts/2020-03-18_SI.svg">SI</option><option value="charts/2020-03-18_SM.svg">SM</option><option value="charts/2020-03-18_TH.svg">TH</option><option value="charts/2020-03-18_TW.svg">TW</option><option value="charts/2020-03-18_US.svg">US</option><option value="charts/2020-03-18_US_CA.svg">US_CA</option><option value="charts/2020-03-18_US_FL.svg">US_FL</option><option value="charts/2020-03-18_US_GA.svg">US_GA</option><option value="charts/2020-03-18_US_MA.svg">US_MA</option><option value="charts/2020-03-18_US_NJ.svg">US_NJ</option><option value="charts/2020-03-18_US_NY.svg">US_NY</option><option value="charts/2020-03-18_US_OR.svg">US_OR</option><option value="charts/2020-03-18_US_TX.svg">US_TX</option><option value="charts/2020-03-18_US_WA.svg">US_WA</option><option value="charts/2020-03-18_VN.svg">VN</option></select>
+        </div>
+
+        <!-- Chart section -->
+        <div class="flex">
+            <img id="chart" src="static/transparent.png" class="contain fullwidth">
+        </div>
+
+        <!-- Select the default chart -->
+        <script>const selector=document.querySelector("#country"),updateChart=()=>document.querySelector("#chart").src=selector.options[selector.selectedIndex].value;selector.addEventListener("change",e=>updateChart()),selector.value=Array.prototype.filter.call(selector.querySelectorAll("option"),e=>"US"===e.text)[0].value,updateChart();</script>
+
+        <!-- Load analytics at the end of the page -->
+        <!-- <script src="templates/analytics.tpl.html" data-include></script> -->
+    
+</body></html>
