@@ -55,8 +55,7 @@ for key in tqdm(list(sorted(df['CountryCode'].unique()))):
     )
 
     # Forecast date is equal to the date of the last known datapoint, unless manually supplied
-    # forecast_date = region.index[-1]
-    forecast_date = sys.argv[1]
+    forecast_date = region.index[-1]
     region = region[region.index <= forecast_date]
 
     # Early exit: If there are less than DATAPOINT_COUNT_MIN datapoints
