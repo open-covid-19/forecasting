@@ -1,8 +1,7 @@
 # Open COVID-19 Forecasting
 This repository contains forecasting data of the next 3 days for all countries
 and regions which contain at least 10 days of data since reporting 10 confirmed
-COVID-19 positive cases or more. It also implements a very simple page to view
-the forecasting data.
+COVID-19 positive cases or more.
 
 ### Data
 The dataset used to perform the forecasting is the [Open COVID-19 Dataset][1],
@@ -48,17 +47,6 @@ python input/forecast_world.py
 python input/forecast_usa.py
 # Build map of all charts
 python input/build_json.py
-```
-
-### Building the website
-To build the website, run the following commands **after** the data is updated:
-```sh
-# Install dependencies
-npm install
-# Build webpage components
-npm run build
-# Serve website at port 8080
-npm run start
 ```
 
 [1]: https://github.com/open-covid-19/data

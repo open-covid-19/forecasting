@@ -59,6 +59,7 @@ for key in tqdm(list(sorted(df['CountryCode'].unique()))):
     region = region[region.index <= forecast_date]
 
     # Early exit: If there are less than DATAPOINT_COUNT_MIN datapoints
+    # TODO: Draw simple chart with data for visualization without forecast
     if len(region) < DATAPOINT_COUNT_MIN: continue
 
     # Define the subfolder that will hold the output assets
