@@ -8,7 +8,7 @@ from multiprocessing import cpu_count
 import pandas as pd
 from tqdm import tqdm
 
-from utils import get_outbreak_mask, forecast, plot_estimate, plot_forecast
+from utils import dataframe_output, get_outbreak_mask, forecast, plot_estimate, plot_forecast
 
 # Establish root of the project
 ROOT = Path(os.path.dirname(__file__)) / '..'
@@ -18,15 +18,21 @@ predict_window = 3
 DATAPOINT_COUNT_MIN = 10
 
 # Read data from the open COVID-19 dataset
-df = pd.read_csv('https://raw.githubusercontent.com/open-covid-19/data/master/output/usa.csv')
+df = pd.read_csv('https://open-covid-19.github.io/data/usa.csv')
 df['Confirmed'] = df['Confirmed'].astype(float)
 df['Deaths'] = df['Deaths'].astype(float)
 df = df.set_index('Date')
+
+# All country codes and names should be the same, so save only the first one
+country_code = df['CountryCode'].iloc[0]
+country_name = df['CountryName'].iloc[0]
 
 forecast_columns = [
     'ForecastDate',
     'Date',
     'Region',
+    'CountryCode',
+    'CountryName',
     'Estimated',
     'Confirmed',
     'ForecastChart',
@@ -37,7 +43,7 @@ forecast_df = pd.DataFrame(columns=forecast_columns).set_index(['Region', 'Date'
 for key in tqdm(list(sorted(df['Region'].unique()))):
 
     # Filter dataset
-    cols = ['Region', 'Confirmed']
+    cols = ['Region', 'CountryCode', 'CountryName', 'Confirmed']
     # Get data only for the selected country
     region = df[df['Region'] == key][cols]
     # Get data only after the outbreak begun
@@ -68,12 +74,13 @@ for key in tqdm(list(sorted(df['Region'].unique()))):
 
     # Aggregate forecast data
     for idx in forecast_data.index:
+        forecast_df.loc[(key, idx), 'CountryCode'] = country_code
+        forecast_df.loc[(key, idx), 'CountryName'] = country_name
         forecast_df.loc[(key, idx), 'ForecastDate'] = forecast_date
         forecast_df.loc[(key, idx), 'Estimated'] = '%.03f' % forecast_data[idx]
         forecast_df.loc[(key, idx), 'ForecastChart'] = forecast_chart.relative_to(ROOT / 'output')
     for idx in region['Confirmed'].index:
         forecast_df.loc[(key, idx), 'Confirmed'] = int(region.loc[idx, 'Confirmed'])
 
-# Save output to CSV
-forecast_df = forecast_df.reset_index().sort_values(['ForecastDate', 'Region'])
-forecast_df[forecast_columns].to_csv(ROOT / 'output' / 'usa.csv', index=False)
+# Save output to CSV and JSON
+dataframe_output(forecast_df, ROOT, 'usa')

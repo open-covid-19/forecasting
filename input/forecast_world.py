@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 from tqdm import tqdm
 
-from utils import get_outbreak_mask, forecast, plot_estimate, plot_forecast
+from utils import dataframe_output, get_outbreak_mask, forecast, plot_estimate, plot_forecast
 
 # Establish root of the project
 ROOT = Path(os.path.dirname(__file__)) / '..'
@@ -15,7 +15,7 @@ predict_window = 3
 DATAPOINT_COUNT_MIN = 10
 
 # Read data from the open COVID-19 dataset
-df = pd.read_csv('https://raw.githubusercontent.com/open-covid-19/data/master/output/world.csv')
+df = pd.read_csv('https://open-covid-19.github.io/data/world.csv')
 df['Confirmed'] = df['Confirmed'].astype(float)
 df['Deaths'] = df['Deaths'].astype(float)
 df = df.set_index('Date')
@@ -41,7 +41,7 @@ for key in df['CountryCode'].unique():
 for key in tqdm(list(sorted(df['CountryCode'].unique()))):
 
     # Filter dataset
-    cols = ['CountryCode', 'Confirmed']
+    cols = ['CountryCode', 'CountryName', 'Confirmed']
     # Get data only for the selected country
     region = df[df['CountryCode'] == key][cols]
     # Get data only after the outbreak begun
@@ -80,6 +80,5 @@ for key in tqdm(list(sorted(df['CountryCode'].unique()))):
     for idx in region['Confirmed'].index:
         forecast_df.loc[(key, idx), 'Confirmed'] = int(region.loc[idx, 'Confirmed'])
 
-# Save output to CSV
-forecast_df = forecast_df.reset_index().sort_values(['ForecastDate', 'CountryCode'])
-forecast_df[forecast_columns].to_csv(ROOT / 'output' / 'world.csv', index=False)
+# Save output to CSV and JSON
+dataframe_output(forecast_df, ROOT, 'world')

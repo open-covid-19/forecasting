@@ -2,7 +2,8 @@ import datetime
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
+import pandas
+from pandas import DataFrame
 from scipy import optimize
 
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ import seaborn as sns
 sns.set()
 
 # Helper function used to filter out uninteresting dates
-def get_outbreak_mask(data: pd.DataFrame, threshold: int = 10):
+def get_outbreak_mask(data: DataFrame, threshold: int = 10):
     ''' Returns a mask for > N confirmed cases '''
     return data['Confirmed'] > threshold
 
@@ -26,7 +27,7 @@ def forward_indices(indices: list, window: int):
     return [date.isoformat() for date in date_indices]
 
 # Main work function for each subset of data
-def forecast(data: pd.Series, window: int):
+def forecast(data: pandas.Series, window: int):
     '''
     Perform a forecast of `window` days past the last day of `data`, including a model estimate of
     all days already existing in `data`.
@@ -45,17 +46,18 @@ def forecast(data: pd.Series, window: int):
 
     # Perform projection with the previously estimated parameters
     projected = [logistic_function(x, *params) for x in range(len(X) + window)]
-    return pd.Series(projected, index=date_indices, name='Projected')
+    return pandas.Series(projected, index=date_indices, name='Projected')
 
-def plot_estimate(fname: str, data: pd.Series, estimate: pd.Series):
+def plot_estimate(fname: str, data: pandas.Series, estimate: pandas.Series = None):
     ax = data.plot(kind='bar', figsize=(16, 8), grid=True)
-    ax.plot(data.index, estimate[data.index], color='red', label='Estimate')
+    if estimate is not None:
+        ax.plot(data.index, estimate[data.index], color='red', label='Estimate')
     ax.legend()
     ax.get_figure().tight_layout()
     ax.get_figure().savefig(fname)
     plt.close(ax.get_figure())
 
-def plot_forecast(fname: str, data: pd.Series, estimate: pd.Series):
+def plot_forecast(fname: str, data: pandas.Series, estimate: pandas.Series):
 
     # Replace all the indices from data with zeroes in our projected data
     projected = estimate.copy()
@@ -66,10 +68,52 @@ def plot_forecast(fname: str, data: pd.Series, estimate: pd.Series):
     for index in sorted(set(estimate.index) - set(data.index)):
         data.loc[index] = 0
 
-    df = pd.DataFrame({'Confirmed': data, 'Projected': projected})
+    df = DataFrame({'Confirmed': data, 'Projected': projected})
     ax = df.plot(kind='bar', figsize=(16, 8), grid=True)
     ax.plot(estimate.index, estimate, color='red', label='Estimate')
     ax.legend()
     ax.get_figure().tight_layout()
     ax.get_figure().savefig(fname)
     plt.close(ax.get_figure())
+
+def dataframe_to_json(data: DataFrame, path: Path, **kwargs):
+    ''' Saves a DataFrame into a UTF-8 encoded JSON file '''
+    with open(path, 'w', encoding='UTF-8') as file:
+        data.to_json(file, force_ascii=False, **kwargs)
+
+def dataframe_output(data: DataFrame, root: Path, name: str):
+    '''
+    This function performs the following steps:
+    1. Sorts the dataset by date and country / region
+    2. Outputs dataset as CSV and JSON to output/<name>.csv and output/<name>.json
+    '''
+    # Make sure the data has no index
+    data = data.reset_index()
+
+    # Infer pivot columns depending on whether this is country-level or region-level data
+    pivot_columns = ['CountryCode', 'CountryName']
+    if 'Region' in data.columns: pivot_columns = ['Region'] + pivot_columns
+
+    # Chart columns are relative paths to image files
+    chart_columns = ['ForecastChart']
+
+    # Core columns are those that appear in all datasets
+    core_columns = \
+        ['ForecastDate', 'Date'] + pivot_columns + ['Estimated', 'Confirmed'] + chart_columns
+
+    # Make sure the dataset is properly sorted
+    data = data[core_columns].sort_values(['ForecastDate', pivot_columns[0]])
+
+    # Make sure the core columns have the right data type
+    data['ForecastDate'] = data['ForecastDate'].astype(str)
+    data['Date'] = data['Date'].astype(str)
+    data['Estimated'] = data['Estimated'].astype(float)
+    data['Confirmed'] = data['Confirmed'].astype(float).astype('Int64')
+    for pivot_column in pivot_columns:
+        data[pivot_column] = data[pivot_column].astype(str)
+    for chart_column in chart_columns:
+        data[chart_column] = data[chart_column].astype(str)
+
+    # Output dataset to CSV and JSON files
+    data.to_csv(root / 'output' / ('%s.csv' % name), index=False)
+    dataframe_to_json(data, root / 'output' / ('%s.json' % name), orient='records')
