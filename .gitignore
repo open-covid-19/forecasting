@@ -1,4 +1,1 @@
-public/
-node_modules/
-yarn.lock
 *.pyc

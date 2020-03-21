@@ -57,7 +57,8 @@ def plot_estimate(fname: str, data: pandas.Series, estimate: pandas.Series = Non
     ax.get_figure().savefig(fname)
     plt.close(ax.get_figure())
 
-def plot_forecast(fname: str, data: pandas.Series, estimate: pandas.Series):
+def plot_forecast(
+    fname: str, data: pandas.Series, estimate: pandas.Series, limit: int = 14):
 
     # Replace all the indices from data with zeroes in our projected data
     projected = estimate.copy()
@@ -68,10 +69,17 @@ def plot_forecast(fname: str, data: pandas.Series, estimate: pandas.Series):
     for index in sorted(set(estimate.index) - set(data.index)):
         data.loc[index] = 0
 
+    # Only plot the last `limit` datapoints
+    if limit > 0:
+        data = data.iloc[-limit:]
+        estimate = estimate.iloc[-limit:]
+        projected = projected.iloc[-limit:]
+
     df = DataFrame({'Confirmed': data, 'Projected': projected})
-    ax = df.plot(kind='bar', figsize=(16, 8), grid=True)
+    ax = df.plot(kind='bar', figsize=(16, 8), grid=True, fontsize='x-large')
     ax.plot(estimate.index, estimate, color='red', label='Estimate')
-    ax.legend()
+    ax.legend(loc='upper left', fontsize='x-large')
+    ax.xaxis.set_label_text('')
     ax.get_figure().tight_layout()
     ax.get_figure().savefig(fname)
     plt.close(ax.get_figure())
